@@ -336,6 +336,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_profiles_with_privacy: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          bio: string
+          created_at: string
+          current_company: string
+          current_position: string
+          department: string
+          email: string
+          full_name: string
+          graduation_year: number
+          id: string
+          linkedin_url: string
+          location: string
+          phone: string
+          twitter_url: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
