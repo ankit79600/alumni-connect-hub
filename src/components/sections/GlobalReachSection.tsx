@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import { InteractiveGlobe } from "@/components/3d/InteractiveGlobe";
+import { GoogleMapsAlumni } from "@/components/maps/GoogleMapsAlumni";
 import { Globe, MapPin, Building2, Plane } from "lucide-react";
+import { useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const highlights = [
   { icon: Globe, value: "120+", label: "Countries" },
@@ -9,7 +12,10 @@ const highlights = [
   { icon: Plane, value: "50+", label: "Annual Events" },
 ];
 
+type ViewMode = "globe" | "map";
+
 export function GlobalReachSection() {
+  const [viewMode, setViewMode] = useState<ViewMode>("globe");
   return (
     <section className="py-24 relative overflow-hidden">
       {/* Background */}

@@ -3,24 +3,67 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Lovable App</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    <title>AlumniHub - Connect with Your Network</title>
+    <meta name="description" content="AlumniHub - Connect with 50K+ graduates worldwide. Find mentors, discover job opportunities, and build lasting professional relationships." />
+    <meta name="author" content="AlumniHub" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    <meta property="og:title" content="Lovable App" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <meta property="og:title" content="AlumniHub - Alumni Network Platform" />
+    <meta property="og:description" content="Connect with 50K+ graduates worldwide. Find mentors, discover job opportunities, and build lasting professional relationships." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
+    <meta name="twitter:site" content="@AlumniHub" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Google Maps JavaScript API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDemo123&libraries=places,visualization&callback=initMap"></script>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+      
+      // Firebase configuration (demo config - replace with your own)
+      const firebaseConfig = {
+        apiKey: "AIzaSyDemo123",
+        authDomain: "alumnihub-demo.firebaseapp.com",
+        projectId: "alumnihub-demo",
+        storageBucket: "alumnihub-demo.appspot.com",
+        messagingSenderId: "123456789",
+        appId: "1:123456789:web:abc123def456",
+        measurementId: "G-DEMO123"
+      };
+      
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      
+      // Make analytics available globally
+      window.firebaseAnalytics = { analytics, logEvent };
+      
+      // Log page view
+      logEvent(analytics, 'page_view');
+    </script>
+
+    <!-- Google Identity Services for OAuth -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Initialize Google Maps callback
+      function initMap() {
+        window.googleMapsLoaded = true;
+        document.dispatchEvent(new Event('google-maps-loaded'));
+      }
+    </script>
   </body>
 </html>

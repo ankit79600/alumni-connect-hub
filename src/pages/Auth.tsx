@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { GraduationCap, Mail, Lock, User, Building, Calendar, ArrowLeft, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 type UserRole = "alumni" | "student" | "admin";
 
@@ -255,6 +257,18 @@ export default function Auth() {
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {isSignUp ? "Create Account" : "Sign In"}
                 </Button>
+
+                <div className="relative my-4">
+                  <Separator />
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+                    or continue with
+                  </span>
+                </div>
+
+                <GoogleSignInButton 
+                  onSuccess={() => navigate("/dashboard")}
+                  text={isSignUp ? "signup_with" : "signin_with"}
+                />
               </form>
 
               <div className="mt-6 text-center text-sm">
