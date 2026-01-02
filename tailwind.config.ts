@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
-        display: ["Space Grotesk", "system-ui", "sans-serif"],
+        sans: ["Roboto", "Plus Jakarta Sans", "system-ui", "sans-serif"],
+        display: ["Google Sans", "Space Grotesk", "system-ui", "sans-serif"],
+        google: ["Google Sans", "Roboto", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
