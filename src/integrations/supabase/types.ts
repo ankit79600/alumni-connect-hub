@@ -160,6 +160,36 @@ export type Database = {
         }
         Relationships: []
       }
+      mentorship_requests: {
+        Row: {
+          created_at: string
+          id: string
+          mentee_id: string
+          mentor_id: string
+          message: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mentee_id: string
+          mentor_id: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mentee_id?: string
+          mentor_id?: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -225,6 +255,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          achievements: string[] | null
+          activities: string[] | null
           avatar_url: string | null
           bio: string | null
           created_at: string | null
@@ -235,14 +267,18 @@ export type Database = {
           full_name: string
           graduation_year: number | null
           id: string
+          is_mentor: boolean | null
           linkedin_url: string | null
           location: string | null
           phone: string | null
+          skills: string[] | null
           twitter_url: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          achievements?: string[] | null
+          activities?: string[] | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
@@ -253,14 +289,18 @@ export type Database = {
           full_name: string
           graduation_year?: number | null
           id?: string
+          is_mentor?: boolean | null
           linkedin_url?: string | null
           location?: string | null
           phone?: string | null
+          skills?: string[] | null
           twitter_url?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          achievements?: string[] | null
+          activities?: string[] | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
@@ -271,9 +311,11 @@ export type Database = {
           full_name?: string
           graduation_year?: number | null
           id?: string
+          is_mentor?: boolean | null
           linkedin_url?: string | null
           location?: string | null
           phone?: string | null
+          skills?: string[] | null
           twitter_url?: string | null
           updated_at?: string | null
           user_id?: string

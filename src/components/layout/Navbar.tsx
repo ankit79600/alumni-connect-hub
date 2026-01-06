@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GraduationCap, Menu, X, User, LogOut, Settings } from "lucide-react";
+import { GraduationCap, Menu, X, User, LogOut, MessageSquare, PenSquare } from "lucide-react";
 import { useState } from "react";
 
 export function Navbar() {
@@ -22,12 +22,15 @@ export function Navbar() {
     navigate("/");
   };
 
+  const isAlumni = role === "alumni" || role === "admin";
+
   const navLinks = [
     { label: "Directory", href: "/directory" },
     { label: "Events", href: "/events" },
     { label: "Jobs", href: "/jobs" },
     { label: "News", href: "/news" },
     { label: "Stories", href: "/stories" },
+    { label: "Mentorship", href: "/mentorship" },
   ];
 
   if (role === "admin") {
@@ -87,10 +90,18 @@ export function Navbar() {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/messages" className="cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
+                      <MessageSquare className="mr-2 h-4 w-4" />
                       Messages
                     </Link>
                   </DropdownMenuItem>
+                  {isAlumni && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/alumni-dashboard" className="cursor-pointer">
+                        <PenSquare className="mr-2 h-4 w-4" />
+                        Create Content
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />

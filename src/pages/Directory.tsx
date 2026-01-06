@@ -1,18 +1,25 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Building, GraduationCap, Mail, Linkedin } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { Search, MapPin, Building, GraduationCap, Mail, Linkedin, Send, Loader2 } from "lucide-react";
 
 interface Profile {
   id: string;
+  user_id: string;
   full_name: string;
   email: string;
+  avatar_url: string | null;
   graduation_year: number | null;
   department: string | null;
   current_company: string | null;
@@ -22,11 +29,17 @@ interface Profile {
 }
 
 export default function Directory() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [deptFilter, setDeptFilter] = useState<string>("all");
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [messageContent, setMessageContent] = useState("");
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     fetchProfiles();
@@ -37,6 +50,37 @@ export default function Directory() {
     setProfiles(data || []);
     setLoading(false);
   }
+
+  const handleMessageClick = (profile: Profile) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    setSelectedProfile(profile);
+    setMessageDialogOpen(true);
+  };
+
+  const sendMessage = async () => {
+    if (!user || !selectedProfile || !messageContent.trim()) return;
+
+    setSending(true);
+    const { error } = await supabase.from("messages").insert({
+      sender_id: user.id,
+      receiver_id: selectedProfile.user_id,
+      content: messageContent.trim(),
+    });
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Message Sent", description: `Your message has been sent to ${selectedProfile.full_name}` });
+      setMessageDialogOpen(false);
+      setMessageContent("");
+      setSelectedProfile(null);
+      navigate("/messages");
+    }
+    setSending(false);
+  };
 
   const filteredProfiles = profiles.filter((p) => {
     const matchesSearch = p.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,6 +131,7 @@ export default function Directory() {
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <Avatar className="h-14 w-14">
+                      <AvatarImage src={profile.avatar_url || ""} />
                       <AvatarFallback className="bg-gradient-primary text-primary-foreground text-lg">
                         {profile.full_name.split(" ").map((n) => n[0]).join("")}
                       </AvatarFallback>
@@ -105,8 +150,16 @@ export default function Directory() {
                     {profile.location && <div className="flex items-center gap-2"><MapPin className="h-4 w-4" />{profile.location}</div>}
                   </div>
                   <div className="mt-4 flex gap-2">
-                    <Button size="sm" variant="outline" className="flex-1"><Mail className="h-4 w-4 mr-1" />Message</Button>
-                    {profile.linkedin_url && <Button size="sm" variant="ghost"><Linkedin className="h-4 w-4" /></Button>}
+                    {profile.user_id !== user?.id && (
+                      <Button size="sm" variant="outline" className="flex-1" onClick={() => handleMessageClick(profile)}>
+                        <Mail className="h-4 w-4 mr-1" />Message
+                      </Button>
+                    )}
+                    {profile.linkedin_url && (
+                      <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
+                        <Button size="sm" variant="ghost"><Linkedin className="h-4 w-4" /></Button>
+                      </a>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -117,6 +170,30 @@ export default function Directory() {
           <div className="text-center py-12 text-muted-foreground">No alumni found matching your criteria.</div>
         )}
       </div>
+
+      {/* Message Dialog */}
+      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send Message to {selectedProfile?.full_name}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              placeholder="Write your message..."
+              value={messageContent}
+              onChange={(e) => setMessageContent(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMessageDialogOpen(false)}>Cancel</Button>
+            <Button onClick={sendMessage} disabled={!messageContent.trim() || sending}>
+              {sending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+              Send
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

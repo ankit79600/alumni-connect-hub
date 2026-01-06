@@ -16,6 +16,8 @@ import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import Donate from "./pages/Donate";
+import Mentorship from "./pages/Mentorship";
+import AlumniDashboard from "./pages/AlumniDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +42,8 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/donate" element={<Donate />} />
+            <Route path="/mentorship" element={<Mentorship />} />
+            <Route path="/alumni-dashboard" element={<AlumniDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
