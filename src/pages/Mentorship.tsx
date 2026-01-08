@@ -1,30 +1,53 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useMentorship } from "@/hooks/useMentorship";
+import { useMentorshipSessions, MentorshipSession } from "@/hooks/useMentorshipSessions";
 import { useAuth } from "@/lib/auth";
 import { MentorCard } from "@/components/mentorship/MentorCard";
 import { MentorshipRequestCard } from "@/components/mentorship/MentorshipRequestCard";
+import { MentorshipConnectionCard } from "@/components/mentorship/MentorshipConnectionCard";
+import { SessionCard } from "@/components/mentorship/SessionCard";
+import { ScheduleSessionDialog } from "@/components/mentorship/ScheduleSessionDialog";
+import { FeedbackDialog } from "@/components/mentorship/FeedbackDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
-import { Users, UserCheck, Search, Loader2, GraduationCap } from "lucide-react";
+import { Users, UserCheck, Search, Loader2, GraduationCap, Calendar, CheckCircle, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Mentorship() {
   const { user, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { mentors, requests, loading, sendRequest, updateRequestStatus, toggleMentorStatus } = useMentorship();
+  const { 
+    sessions, 
+    upcomingSessions, 
+    completedSessions, 
+    loading: sessionsLoading, 
+    scheduleSession, 
+    updateSessionStatus, 
+    submitFeedback 
+  } = useMentorshipSessions();
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [selectedMentorId, setSelectedMentorId] = useState<string | null>(null);
   const [requestMessage, setRequestMessage] = useState("");
   const [sending, setSending] = useState(false);
+  
+  // Session scheduling state
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<{ id: string; menteeId: string; menteeName: string } | null>(null);
+  
+  // Feedback state
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<MentorshipSession | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -59,12 +82,50 @@ export default function Mentorship() {
     setSelectedMentorId(null);
   };
 
+  const handleScheduleSession = (requestId: string, menteeId: string, menteeName: string) => {
+    setSelectedRequest({ id: requestId, menteeId, menteeName });
+    setScheduleDialogOpen(true);
+  };
+
+  const handleScheduleSubmit = async (date: Date, duration: number, meetingLink?: string, notes?: string) => {
+    if (!selectedRequest || !user?.id) return;
+    await scheduleSession(
+      selectedRequest.id,
+      user.id,
+      selectedRequest.menteeId,
+      date,
+      duration,
+      meetingLink,
+      notes
+    );
+    setSelectedRequest(null);
+  };
+
+  const handleLeaveFeedback = (session: MentorshipSession) => {
+    setSelectedSession(session);
+    setFeedbackDialogOpen(true);
+  };
+
+  const handleFeedbackSubmit = async (rating: number, feedback?: string) => {
+    if (!selectedSession || !user?.id) return;
+    const revieweeId = selectedSession.mentor_id === user.id 
+      ? selectedSession.mentee_id 
+      : selectedSession.mentor_id;
+    await submitFeedback(selectedSession.id, revieweeId, rating, feedback);
+    setSelectedSession(null);
+  };
+
   const isAlumni = role === "alumni" || role === "admin";
   const isMentor = mentors.some((m) => m.user_id === user?.id);
   const pendingRequests = requests.filter((r) => r.status === "pending");
   const acceptedRequests = requests.filter((r) => r.status === "accepted");
 
-  if (authLoading || loading) {
+  // Get sessions for a specific mentorship connection
+  const getSessionsForConnection = (requestId: string) => {
+    return sessions.filter((s) => s.request_id === requestId);
+  };
+
+  if (authLoading || loading || sessionsLoading) {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[60vh]">
@@ -102,20 +163,56 @@ export default function Mentorship() {
           </div>
         </motion.div>
 
-        <Tabs defaultValue={isAlumni ? "requests" : "mentors"} className="space-y-6">
-          <TabsList>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Users className="h-6 w-6 mx-auto text-primary mb-2" />
+              <p className="text-2xl font-bold">{acceptedRequests.length}</p>
+              <p className="text-xs text-muted-foreground">{isAlumni ? "Active Mentees" : "My Mentors"}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Clock className="h-6 w-6 mx-auto text-blue-500 mb-2" />
+              <p className="text-2xl font-bold">{upcomingSessions.length}</p>
+              <p className="text-xs text-muted-foreground">Upcoming Sessions</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <CheckCircle className="h-6 w-6 mx-auto text-green-500 mb-2" />
+              <p className="text-2xl font-bold">{completedSessions.length}</p>
+              <p className="text-xs text-muted-foreground">Completed Sessions</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Calendar className="h-6 w-6 mx-auto text-purple-500 mb-2" />
+              <p className="text-2xl font-bold">{pendingRequests.length}</p>
+              <p className="text-xs text-muted-foreground">Pending Requests</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue={isAlumni ? "connections" : "mentors"} className="space-y-6">
+          <TabsList className="flex-wrap h-auto">
             {!isAlumni && <TabsTrigger value="mentors">Find Mentors</TabsTrigger>}
+            <TabsTrigger value="connections">
+              <UserCheck className="h-4 w-4 mr-1" />
+              {isAlumni ? "Mentees" : "My Mentors"}
+            </TabsTrigger>
+            <TabsTrigger value="sessions">
+              <Calendar className="h-4 w-4 mr-1" />
+              Sessions
+            </TabsTrigger>
             <TabsTrigger value="requests" className="flex items-center gap-2">
-              {isAlumni ? "Requests" : "My Requests"}
+              Requests
               {pendingRequests.length > 0 && (
                 <span className="h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
                   {pendingRequests.length}
                 </span>
               )}
-            </TabsTrigger>
-            <TabsTrigger value="connections">
-              <UserCheck className="h-4 w-4 mr-1" />
-              {isAlumni ? "Mentees" : "My Mentors"}
             </TabsTrigger>
           </TabsList>
 
@@ -159,6 +256,96 @@ export default function Mentorship() {
             </TabsContent>
           )}
 
+          {/* Connections Tab */}
+          <TabsContent value="connections">
+            {acceptedRequests.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <UserCheck className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="font-semibold text-lg mb-2">No active mentorships</h3>
+                  <p className="text-muted-foreground">
+                    {isAlumni ? "Accepted mentees will appear here" : "Connect with mentors to start your journey"}
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {acceptedRequests.map((req) => (
+                  <MentorshipConnectionCard
+                    key={req.id}
+                    request={req}
+                    sessions={getSessionsForConnection(req.id)}
+                    isMentor={isAlumni}
+                    onScheduleSession={() => handleScheduleSession(
+                      req.id,
+                      req.mentee_id,
+                      req.mentee_profile?.full_name || "Mentee"
+                    )}
+                    onMessage={() => navigate(`/messages?user=${isAlumni ? req.mentee_id : req.mentor_id}`)}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Sessions Tab */}
+          <TabsContent value="sessions" className="space-y-6">
+            {/* Upcoming Sessions */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Clock className="h-5 w-5 text-blue-500" />
+                Upcoming Sessions ({upcomingSessions.length})
+              </h3>
+              {upcomingSessions.length === 0 ? (
+                <Card>
+                  <CardContent className="py-8 text-center text-muted-foreground">
+                    No upcoming sessions scheduled
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {upcomingSessions.map((session) => (
+                    <SessionCard
+                      key={session.id}
+                      session={session}
+                      isMentor={session.mentor_id === user?.id}
+                      currentUserId={user?.id || ""}
+                      onMarkCompleted={(id) => updateSessionStatus(id, "completed")}
+                      onMarkMissed={(id) => updateSessionStatus(id, "missed")}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Completed Sessions */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                Completed Sessions ({completedSessions.length})
+              </h3>
+              {completedSessions.length === 0 ? (
+                <Card>
+                  <CardContent className="py-8 text-center text-muted-foreground">
+                    No completed sessions yet
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {completedSessions.map((session) => (
+                    <SessionCard
+                      key={session.id}
+                      session={session}
+                      isMentor={session.mentor_id === user?.id}
+                      currentUserId={user?.id || ""}
+                      onLeaveFeedback={handleLeaveFeedback}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
           {/* Requests Tab */}
           <TabsContent value="requests">
             {pendingRequests.length === 0 ? (
@@ -181,27 +368,6 @@ export default function Mentorship() {
                     onAccept={(id) => updateRequestStatus(id, "accepted")}
                     onReject={(id) => updateRequestStatus(id, "rejected")}
                   />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Connections Tab */}
-          <TabsContent value="connections">
-            {acceptedRequests.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <UserCheck className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="font-semibold text-lg mb-2">No active mentorships</h3>
-                  <p className="text-muted-foreground">
-                    {isAlumni ? "Accepted mentees will appear here" : "Connect with mentors to start your journey"}
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {acceptedRequests.map((req) => (
-                  <MentorshipRequestCard key={req.id} request={req} isAlumni={isAlumni} />
                 ))}
               </div>
             )}
@@ -234,6 +400,28 @@ export default function Mentorship() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Schedule Session Dialog */}
+        <ScheduleSessionDialog
+          open={scheduleDialogOpen}
+          onOpenChange={setScheduleDialogOpen}
+          onSchedule={handleScheduleSubmit}
+          menteeName={selectedRequest?.menteeName || ""}
+        />
+
+        {/* Feedback Dialog */}
+        <FeedbackDialog
+          open={feedbackDialogOpen}
+          onOpenChange={setFeedbackDialogOpen}
+          onSubmit={handleFeedbackSubmit}
+          revieweeName={
+            selectedSession
+              ? selectedSession.mentor_id === user?.id
+                ? selectedSession.mentee_profile?.full_name || "Mentee"
+                : selectedSession.mentor_profile?.full_name || "Mentor"
+              : ""
+          }
+        />
       </div>
     </Layout>
   );
