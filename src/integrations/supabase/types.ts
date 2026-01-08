@@ -181,6 +181,44 @@ export type Database = {
         }
         Relationships: []
       }
+      mentorship_feedback: {
+        Row: {
+          created_at: string
+          feedback: string | null
+          id: string
+          rating: number
+          reviewee_id: string
+          reviewer_id: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          rating: number
+          reviewee_id: string
+          reviewer_id: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          rating?: number
+          reviewee_id?: string
+          reviewer_id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentorship_feedback_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentorship_requests: {
         Row: {
           created_at: string
@@ -210,6 +248,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      mentorship_sessions: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          id: string
+          meeting_link: string | null
+          mentee_id: string
+          mentor_id: string
+          notes: string | null
+          request_id: string
+          scheduled_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          meeting_link?: string | null
+          mentee_id: string
+          mentor_id: string
+          notes?: string | null
+          request_id: string
+          scheduled_at: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          meeting_link?: string | null
+          mentee_id?: string
+          mentor_id?: string
+          notes?: string | null
+          request_id?: string
+          scheduled_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentorship_sessions_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
