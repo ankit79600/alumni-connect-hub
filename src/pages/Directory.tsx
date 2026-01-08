@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { FollowButton } from "@/components/connections/FollowButton";
 import { Search, MapPin, Building, GraduationCap, Mail, Linkedin, Send, Loader2 } from "lucide-react";
 
 interface Profile {
@@ -151,9 +152,12 @@ export default function Directory() {
                   </div>
                   <div className="mt-4 flex gap-2">
                     {profile.user_id !== user?.id && (
-                      <Button size="sm" variant="outline" className="flex-1" onClick={() => handleMessageClick(profile)}>
-                        <Mail className="h-4 w-4 mr-1" />Message
-                      </Button>
+                      <>
+                        <FollowButton profileUserId={profile.user_id} variant="outline" size="sm" />
+                        <Button size="sm" variant="outline" className="flex-1" onClick={() => handleMessageClick(profile)}>
+                          <Mail className="h-4 w-4 mr-1" />Message
+                        </Button>
+                      </>
                     )}
                     {profile.linkedin_url && (
                       <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">

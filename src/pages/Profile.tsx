@@ -8,7 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileEditDialog } from "@/components/profile/ProfileEditDialog";
+import { ConnectionsList } from "@/components/connections/ConnectionsList";
 import { useProfile } from "@/hooks/useProfile";
+import { useConnections } from "@/hooks/useConnections";
 import { useNavigate } from "react-router-dom";
 import {
   Briefcase, MapPin, Calendar, Linkedin, Twitter, Mail,
@@ -19,6 +21,7 @@ export default function Profile() {
   const { user, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { profile, loading, refetch } = useProfile();
+  const { followerCount, followingCount } = useConnections();
   const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
@@ -117,10 +120,11 @@ export default function Profile() {
 
         {/* Tabs */}
         <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
             <TabsTrigger value="skills">Skills</TabsTrigger>
             <TabsTrigger value="achievements">Achievements</TabsTrigger>
+            <TabsTrigger value="network">Network</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
 
@@ -206,6 +210,14 @@ export default function Profile() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="network">
+            <ConnectionsList 
+              userId={user.id} 
+              followerCount={followerCount} 
+              followingCount={followingCount} 
+            />
           </TabsContent>
 
           <TabsContent value="activity">
