@@ -110,7 +110,7 @@ export default function AlumniDashboard() {
           alumni_id: user?.id,
         });
         if (error) throw error;
-        toast({ title: "Success", description: "Story submitted for approval!" });
+        toast({ title: "Success", description: "Story published successfully!" });
       }
 
       setForm(initialForm);
@@ -285,7 +285,7 @@ export default function AlumniDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>Share Your Story</CardTitle>
-                  <CardDescription>Inspire others with your success story (requires approval)</CardDescription>
+                  <CardDescription>Inspire others with your success story</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
