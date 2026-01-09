@@ -12,7 +12,7 @@ export default function Stories() {
 
   useEffect(() => {
     async function fetchStories() {
-      const { data } = await supabase.from("success_stories").select("*").eq("is_approved", true).order("created_at", { ascending: false });
+      const { data } = await supabase.from("success_stories").select("*").order("created_at", { ascending: false });
       setStories(data || []);
       setLoading(false);
     }
