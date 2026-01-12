@@ -32,19 +32,35 @@ export function AIChatbot() {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    // Client-side input validation
+    if (input.length > 10000) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Message too long. Please keep messages under 10,000 characters." },
+      ]);
+      return;
+    }
+
     const userMessage: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
+      // Get the current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Please log in to use the AI assistant.");
+      }
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
             messages: [...messages, userMessage].map((m) => ({
