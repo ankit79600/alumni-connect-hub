@@ -1,73 +1,155 @@
-# Welcome to your Lovable project
+A centralized alumni–student networking platform where undergraduate students can connect with their pass-out seniors for mentorship, jobs, events, and guidance.
 
-## Project info
+This project aims to bridge the gap between colleges and their alumni community through a modern, scalable web platform.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+🚀 Features
 
-## How can I edit this code?
+🔐 Authentication using Supabase (Email / Google OAuth ready)
 
-There are several ways of editing your application.
+👨‍🎓 Student & Alumni profiles
 
-**Use Lovable**
+📰 Alumni can post:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Jobs
 
-Changes made via Lovable will be committed automatically to this repo.
+Internships
 
-**Use your preferred IDE**
+Events
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Stories & achievements
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+📢 News and announcements for students
 
-Follow these steps:
+🌍 Global alumni reach section (Google Maps integration ready)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+📱 Fully responsive UI
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+🎨 Clean UI using shadcn/ui + Tailwind CSS
 
-# Step 3: Install the necessary dependencies.
-npm i
+🔧 Admin approval system and advanced role-based access are planned in upcoming versions.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+🛠 Tech Stack
+Frontend
+
+⚛️ React (with TypeScript)
+
+⚡ Vite
+
+🎨 Tailwind CSS
+
+🧩 shadcn/ui components
+
+Backend / Services
+
+🟢 Supabase (Auth + Database)
+
+🔐 Google OAuth (Google Identity Services)
+
+📍 Google Maps SDK (for alumni location & reach)
+
+Dev Tools
+
+ESLint
+
+PostCSS
+
+Bun / npm
+
+📂 Project Structure
+alumni-connect-hub/
+├── public/                # Static assets
+├── src/
+│   ├── components/        # Reusable UI components
+│   ├── pages/             # Application pages
+│   ├── lib/               # Supabase & auth utilities
+│   ├── hooks/             # Custom React hooks
+│   └── main.tsx           # App entry point
+├── supabase/              # Supabase configs & migrations
+├── index.html
+├── tailwind.config.ts
+├── vite.config.ts
+└── package.json
+
+⚙️ Environment Setup
+
+Create a .env file in the root directory and add:
+
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+
+
+⚠️ Never push your real API keys to GitHub.
+
+▶️ How to Run Locally
+1. Clone the repo
+git clone https://github.com/ankit79600/alumni-connect-hub.git
+cd alumni-connect-hub
+
+2. Install dependencies
+npm install
+# or
+bun install
+
+3. Start development server
 npm run dev
-```
+# or
+bun dev
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Open in browser:
+👉 http://localhost:8080
+ (or the port shown in terminal)
 
-**Use GitHub Codespaces**
+📌 Current Status
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+✅ UI and main structure implemented
 
-## What technologies are used for this project?
+✅ Supabase authentication connected
 
-This project is built with:
+✅ Google technologies integrated
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+🚧 Role-based access control (Admin / Alumni / Student) — in progress
 
-## How can I deploy this project?
+🚧 Post moderation system — planned
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+🚧 Chat & mentorship system — planned
 
-## Can I connect a custom domain to my Lovable project?
+🎯 Future Improvements
 
-Yes, you can!
+💬 Real-time chat between students and alumni
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+🧠 AI-based mentor recommendation
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+📊 Admin analytics dashboard
+
+🏫 Multi-college onboarding system
+
+📄 Resume upload & verification
+
+🤝 Contributions
+
+Contributions, ideas, and feedback are welcome!
+
+Steps:
+
+Fork the repo
+
+Create a new branch
+
+Make changes
+
+Submit a Pull Request
+
+👨‍💻 Author
+
+Ankit Patel
+B.Tech CSE Student | Tech & Web Enthusiast 🚀
+Building projects to solve real-world problems and preparing for hackathons.
+
+GitHub: https://github.com/ankit79600
+
+⭐ Support
+
+If you like this project, please give it a ⭐ on GitHub — it really motivates me to build more!
